@@ -151,6 +151,9 @@ def util(cache: drgn.Object) -> int:
 
 def lookup_cache_by_address(obj: drgn.Object) -> Optional[drgn.Object]:
     try:
+        # The pylint error disabled below is a false positive
+        # triggered by some updates to drgn's function signatures.
+        # pylint: disable=no-value-for-parameter
         cache = find_containing_slab_cache(obj)
         if cache.value_() == 0x0:
             return None

@@ -58,6 +58,9 @@ class FindPid(sdb.Command):
 
     def _call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         for pid in self.args.pid:
+            # The pylint error disabled below is a false positive
+            # triggered by some updates to drgn's function signatures.
+            # pylint: disable=no-value-for-parameter
             yield find_pid(sdb.get_prog(), pid)
 
 
@@ -90,4 +93,7 @@ class FindTask(sdb.Command):
 
     def _call(self, objs: Iterable[drgn.Object]) -> Iterable[drgn.Object]:
         for pid in self.args.pid:
+            # The pylint error disabled below is a false positive
+            # triggered by some updates to drgn's function signatures.
+            # pylint: disable=no-value-for-parameter
             yield find_task(sdb.get_prog(), pid)
