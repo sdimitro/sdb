@@ -1539,6 +1539,7 @@
           0xffff9ac552bea780   WRITE VDEV_IO_START    -                             -
            0xffff9ac5500d1da0  WRITE VDEV_IO_DONE     -                         -62ms
             0xffff9ac60f5d4f00 WRITE VDEV_IO_START    -                         -78ms
+          0xffff9ac552beac70   WRITE DONE             -                             -
           0xffff9ac552bed8e0   WRITE VDEV_IO_START    -                             -
            0xffff9ac5500d4520  WRITE VDEV_IO_DONE     -                         -63ms
             0xffff9ac60f5d4f00 WRITE VDEV_IO_START    -                         -78ms

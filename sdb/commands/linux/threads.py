@@ -30,7 +30,10 @@ from sdb.commands.linux.stacks import KernelStacks
 
 def _cmdline(obj: drgn.Object) -> str:
     try:
-        s = " ".join(map(lambda s: s.decode("utf-8"), cmdline(obj)))
+        ret = cmdline(obj)
+        if ret is None:
+            return ""
+        s = " ".join(map(lambda s: s.decode("utf-8"), ret))
 
         #
         # The command line for a given thread can be obnoxiously long,
@@ -97,4 +100,7 @@ class KernelThreads(sdb.Locator, sdb.PrettyPrinter):
         table.print_()
 
     def no_input(self) -> Iterable[drgn.Object]:
+        # The pylint error disabled below is a false positive
+        # triggered by some updates to drgn's function signatures.
+        # pylint: disable=no-value-for-parameter
         yield from for_each_task(sdb.get_prog())

@@ -400,6 +400,9 @@ class KernelStacks(sdb.Locator, sdb.PrettyPrinter):
 
     def no_input(self) -> Iterable[drgn.Object]:
         self.validate_context()
+        # The pylint error disabled below is a false positive
+        # triggered by some updates to drgn's function signatures.
+        # pylint: disable=no-value-for-parameter
         yield from filter(self.match_stack, for_each_task(sdb.get_prog()))
 
 
