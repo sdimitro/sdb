@@ -5,7 +5,7 @@
 # build/install of "drgn" will fail below.
 #
 sudo apt update
-sudo apt install bison flex libelf-dev libdw-dev libomp5 libomp-dev
+sudo apt install autoconf automake check gcc git liblzma-dev libelf-dev libdw-dev libtool make pkgconf python3 python3-dev python3-pip python3-setuptools zlib1g-dev bison flex
 
 git clone https://github.com/osandov/drgn.git
 
