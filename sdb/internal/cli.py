@@ -28,6 +28,7 @@ from typing import List
 import drgn
 import sdb
 from sdb.internal.repl import REPL
+from sdb.version import get_version
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -37,6 +38,10 @@ def parse_arguments() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(prog="sdb",
                                      description="The Slick/Simple Debugger")
+    
+    parser.add_argument("--version",
+                        action="version", 
+                        version=get_version())
 
     dump_group = parser.add_argument_group("core/crash dump analysis")
     dump_group.add_argument(
