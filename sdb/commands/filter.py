@@ -57,8 +57,8 @@ class Filter(sdb.SingleInputCommand):
         return parser
 
     @staticmethod
-    def _parse_expression(input_expr: str) -> List[str]:
-        # TODO: Implement expression parsing
+    def _parse_expression(input_expr: str) -> List[str]:  # pylint: disable=unused-argument
+        # TODO: Implement expression parsing  # pylint: disable=fixme
         return []
 
     def __init__(self,

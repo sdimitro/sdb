@@ -624,8 +624,7 @@ class Locator(Command):
             # pylint: disable=no-member
             self.pretty_print(self.caller(objs))
             return None
-        else:
-            return self.caller(objs)
+        return self.caller(objs)
 
 
 T = TypeVar("T", bound=Locator)
