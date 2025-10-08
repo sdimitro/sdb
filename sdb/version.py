@@ -35,13 +35,11 @@ def get_git_commit_hash() -> Optional[str]:
         repo_root = os.path.dirname(module_dir)
         
         # Run git rev-parse to get the current commit hash
-        result = subprocess.run(
-            ['git', 'rev-parse', 'HEAD'],
-            cwd=repo_root,
-            capture_output=True,
-            text=True,
-            check=True
-        )
+        result = subprocess.run(['git', 'rev-parse', 'HEAD'],
+                                cwd=repo_root,
+                                capture_output=True,
+                                text=True,
+                                check=True)
         return result.stdout.strip()
     except (subprocess.CalledProcessError, FileNotFoundError, OSError):
         return None
@@ -56,6 +54,6 @@ def get_version() -> str:
     if commit_hash:
         # Use short hash for readability
         return f"sdb-{commit_hash[:8]}"
-    
+
     # Fallback to package version if git is not available
     return "sdb-0.1.0"

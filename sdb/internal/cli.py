@@ -38,10 +38,8 @@ def parse_arguments() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(prog="sdb",
                                      description="The Slick/Simple Debugger")
-    
-    parser.add_argument("--version",
-                        action="version", 
-                        version=get_version())
+
+    parser.add_argument("--version", action="version", version=get_version())
 
     dump_group = parser.add_argument_group("core/crash dump analysis")
     dump_group.add_argument(
