@@ -57,7 +57,7 @@ class REPL:
             # want to mimic the default readline library behavior of adding
             # a space after it.
             #
-            return results[state] + " "
+            return (results[state] or "") + " "
 
         return custom_complete
 

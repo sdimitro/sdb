@@ -100,7 +100,7 @@ class SplKmemCaches(sdb.Locator, sdb.PrettyPrinter):
                     self.name, f"'{self.args.s}' is not a valid field")
             yield from sorted(
                 kmem.for_each_spl_kmem_cache(),
-                key=SplKmemCaches.FIELDS[self.args.s],
+                key=SplKmemCaches.FIELDS[self.args.s],  # type: ignore[arg-type]
                 reverse=(self.args.s
                          not in SplKmemCaches.DEFAULT_INCREASING_ORDER_FIELDS))
         else:

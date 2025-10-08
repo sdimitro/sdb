@@ -623,8 +623,9 @@ class Locator(Command):
         if self.islast and isinstance(self, PrettyPrinter):
             # pylint: disable=no-member
             self.pretty_print(self.caller(objs))
+            return None
         else:
-            yield from self.caller(objs)
+            return self.caller(objs)
 
 
 T = TypeVar("T", bound=Locator)

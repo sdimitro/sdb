@@ -152,6 +152,7 @@ def invoke(first_input: Iterable[drgn.Object],
             yield from execute_pipeline(first_input, pipeline)
 
         if shell_cmd is not None:
+            assert shell_proc.stdin is not None
             shell_proc.stdin.flush()
             shell_proc.stdin.close()
 

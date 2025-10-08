@@ -58,7 +58,8 @@ class Filter(sdb.SingleInputCommand):
 
     @staticmethod
     def _parse_expression(input_expr: str) -> List[str]:
-        pass
+        # TODO: Implement expression parsing
+        return []
 
     def __init__(self,
                  args: Optional[List[str]] = None,
