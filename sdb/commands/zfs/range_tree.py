@@ -73,7 +73,9 @@ class RangeSeg(sdb.Locator):
 
     @sdb.InputHandler('range_tree_t *')
     def from_range_tree(self, rt: drgn.Object) -> Iterable[drgn.Object]:
-        enum_dict = dict(sdb.get_type('enum range_seg_type').enumerators)
+        enum_type = sdb.get_type('enum range_seg_type')
+        assert enum_type.enumerators is not None
+        enum_dict: dict[str, int] = dict(enum_type.enumerators)  # pyright: ignore
         range_seg_type_to_type = {
             enum_dict['RANGE_SEG32']: 'range_seg32_t*',
             enum_dict['RANGE_SEG64']: 'range_seg64_t*',

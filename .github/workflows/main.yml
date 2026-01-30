@@ -7,35 +7,17 @@ on:
   pull_request:
   schedule:
     - cron:  '0 0 * * *'
+  # Allow release.yml to call this workflow
+  workflow_call:
 
 jobs:
   #
-  # Verify the build and installation of SDB.
+  # Consolidated linting job: pylint + ruff + yapf
   #
-  install:
-    runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        python-version: ['3.10', '3.12']
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - run: python3 -m pip install --upgrade pip setuptools wheel
-      - run: python3 -m pip install .
-        #
-        # The statement below is used for debugging the Github job.
-        #
-      - run: python3 --version
+  # All linters run on a single Python version since they check code quality,
+  # not runtime behavior.
   #
-  # Verify "pylint" runs successfully.
-  #
-  # Note, we need to have "drgn" installed in order to run "pylint".
-  # Thus, prior to running "pylint" we have to clone, build, and install
-  # the "drgn" from source (there's no package currently available).
-  #
-  pylint:
+  lint:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -43,10 +25,59 @@ jobs:
         with:
           python-version: '3.10'
       - run: ./.github/scripts/install-drgn.sh
-      - run: python3 -m pip install pylint pytest
+      - run: python3 -m pip install pylint pytest ruff yapf
       - run: python3 -m pip install .
-      - run: pylint -d duplicate-code -d invalid-name -d missing-docstring -d import-outside-toplevel -d too-many-branches -d missing-module-docstring -d missing-function-docstring sdb
-      - run: pylint -d duplicate-code -d invalid-name -d missing-docstring -d import-outside-toplevel -d too-many-branches -d missing-module-docstring -d missing-function-docstring tests
+      #
+      # Pylint checks
+      #
+      - name: Run pylint on sdb
+        run: pylint -d duplicate-code -d invalid-name -d missing-docstring -d import-outside-toplevel -d too-many-branches -d missing-module-docstring -d missing-function-docstring sdb
+      - name: Run pylint on tests
+        run: pylint -d duplicate-code -d invalid-name -d missing-docstring -d import-outside-toplevel -d too-many-branches -d missing-module-docstring -d missing-function-docstring tests
+      #
+      # Ruff checks (fast Python linter)
+      #
+      - name: Run ruff
+        run: ruff check sdb tests
+      #
+      # YAPF formatting check
+      #
+      - name: Check formatting with yapf (sdb)
+        run: yapf --diff --style google --recursive sdb
+      - name: Check formatting with yapf (tests)
+        run: yapf --diff --style google --recursive tests
+  #
+  # Type checking with mypy and pyright
+  #
+  # Note, we need to have "drgn" installed in order to run type checkers.
+  # Thus, prior to running them we have to clone, build, and install
+  # the "drgn" from source (there's no package currently available).
+  #
+  type-check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: ./.github/scripts/install-drgn.sh
+      - run: python3 -m pip install mypy pyright pytest
+      - run: python3 -m pip install .
+      #
+      # Mypy checks
+      # Note: --ignore-missing-imports for tests because pytest doesn't provide stubs
+      #
+      - name: Run mypy on sdb
+        run: python3 -m mypy --strict --show-error-codes -p sdb
+      - name: Run mypy on tests
+        run: python3 -m mypy --strict --ignore-missing-imports --show-error-codes -p tests
+      #
+      # Pyright checks
+      #
+      - name: Run pyright on sdb
+        run: pyright sdb
+      - name: Run pyright on tests
+        run: pyright tests
   #
   # Verify "pytest" runs successfully on unit tests.
   #
@@ -72,9 +103,6 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.xml
-          fail_ci_if_error: false
-          verbose: true
   #
   # Verify "pytest" runs successfully on integration tests with crash dumps.
   #
@@ -100,58 +128,27 @@ jobs:
       - run: ./.github/scripts/download-dumps-from-gdrive.sh
       - run: ./.github/scripts/extract-dump.sh dump.201912060006.tar.lzma
       - run: ./.github/scripts/extract-dump.sh dump.202303131823.tar.gz
-      - run: pytest -v --cov sdb --cov-report xml tests/integration
+      #
+      # Run integration tests. Use -s flag to show size comparison output
+      # for record-replay tests. Use set -o pipefail to ensure test failures
+      # are properly reported even when piping output.
+      #
+      - name: Run integration tests
+        run: |
+          set -o pipefail
+          pytest -v -s --cov sdb --cov-report xml tests/integration 2>&1 | tee test_output.txt
+      #
+      # Extract and display record-replay size comparison in GitHub summary
+      #
+      - name: Add size comparison to summary
+        if: always()
+        run: |
+          echo "## Record-Replay Size Comparison" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          grep -A 8 "DUMP SIZE COMPARISON" test_output.txt >> $GITHUB_STEP_SUMMARY || echo "No size comparison data found" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.xml
-          fail_ci_if_error: false
-          verbose: true
-  #
-  # Verify "yapf" runs successfully.
-  #
-  yapf:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-      - run: python3 -m pip install yapf
-      - run: yapf --diff --style google --recursive sdb
-      - run: yapf --diff --style google --recursive tests
-  #
-  # Verify "ruff" runs successfully.
-  #
-  ruff:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-      - run: python3 -m pip install ruff
-      - run: ruff check sdb tests
-  #
-  # Verify "mypy" runs successfully.
-  #
-  # Note, we need to have "drgn" installed in order to run "mypy".
-  # Thus, prior to running "mypy" we have to clone, build, and install
-  # the "drgn" from source (there's no package currently available).
-  #
-  # Also note that we supply --ignore-missing-imports to the tests package
-  # because pytest doesn't provide stubs on typeshed.
-  #
-  mypy:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-      - run: ./.github/scripts/install-drgn.sh
-      - run: python3 -m pip install mypy pytest
-      - run: python3 -m pip install .
-      - run: python3 -m mypy --strict --show-error-codes -p sdb
-      - run: python3 -m mypy --strict --ignore-missing-imports --show-error-codes -p tests

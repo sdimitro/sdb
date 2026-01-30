@@ -126,6 +126,20 @@ ignore_missing_imports = true
 module = "sdb._version"
 ignore_missing_imports = true
 
+# Pyright configuration
+[tool.pyright]
+pythonVersion = "3.10"
+typeCheckingMode = "basic"
+# drgn.Object is designed to be used interchangeably with int in many contexts
+# These are intentional design patterns, not bugs
+reportArgumentType = "warning"
+reportReturnType = "warning"
+# Dynamic attributes added by decorators (e.g., input_typename_handled)
+reportFunctionMemberAccess = "none"
+reportAttributeAccessIssue = "warning"
+# Operator type issues in tests (drgn.Type.size can be None but is always int for our types)
+reportOperatorIssue = "warning"
+
 # Pytest configuration
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -78,7 +78,7 @@ class Spa(sdb.Locator, sdb.PrettyPrinter):
                 vdevs = sdb.execute_pipeline([spa], [Vdev()])
                 Vdev(self.arg_list).print_indented(vdevs, 5)
 
-    def no_input(self) -> drgn.Object:
+    def no_input(self) -> Iterable[drgn.Object]:
         spas = sdb.execute_pipeline(
             [sdb.get_object("spa_namespace_avl").address_of_()],
             [Avl(), sdb.Cast(["spa_t *"])],
