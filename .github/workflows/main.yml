@@ -100,7 +100,24 @@ jobs:
       - run: ./.github/scripts/download-dumps-from-gdrive.sh
       - run: ./.github/scripts/extract-dump.sh dump.201912060006.tar.lzma
       - run: ./.github/scripts/extract-dump.sh dump.202303131823.tar.gz
-      - run: pytest -v --cov sdb --cov-report xml tests/integration
+      #
+      # Run record-replay regression tests with captured output for size comparison.
+      # The -s flag ensures size comparison output is visible in the logs.
+      #
+      - name: Run record-replay regression tests
+        run: |
+          echo "## Record-Replay Size Comparison" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # Run tests and capture output, tee to both console and file
+          pytest -v -s tests/integration/test_record_replay_regression.py 2>&1 | tee replay_output.txt
+          # Extract size comparison sections for the summary
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          grep -A 8 "DUMP SIZE COMPARISON" replay_output.txt >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      #
+      # Run remaining integration tests with coverage.
+      #
+      - run: pytest -v --cov sdb --cov-report xml tests/integration --ignore=tests/integration/test_record_replay_regression.py
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
