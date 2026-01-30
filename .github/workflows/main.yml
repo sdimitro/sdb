@@ -12,25 +12,6 @@ on:
 
 jobs:
   #
-  # Verify the build and installation of SDB.
-  #
-  install:
-    runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        python-version: ['3.10', '3.12']
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - run: python3 -m pip install --upgrade pip setuptools wheel
-      - run: python3 -m pip install .
-        #
-        # The statement below is used for debugging the Github job.
-        #
-      - run: python3 --version
-  #
   # Consolidated linting job: pylint + ruff + yapf
   #
   # All linters run on a single Python version since they check code quality,

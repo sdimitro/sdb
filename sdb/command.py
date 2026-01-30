@@ -171,9 +171,9 @@ class Command:
         #       may be calling splitlines() for None.
         #
         if cls.__doc__:
-            summary = (
-                inspect.getdoc(  # type: ignore[union-attr]
-                    cls).splitlines()[0].strip())
+            docstring = inspect.getdoc(cls)
+            assert docstring is not None  # guaranteed by if cls.__doc__
+            summary = docstring.splitlines()[0].strip()
         else:
             summary = None
         return argparse.ArgumentParser(prog=name, description=summary)
@@ -293,8 +293,9 @@ class Command:
             # already be included in the parser description. The second
             # line should be empty. Thus, we skip these two lines.
             #
-            for line in inspect.getdoc(  # type: ignore[union-attr]
-                    cls).splitlines()[2:]:
+            docstring = inspect.getdoc(cls)
+            assert docstring is not None  # guaranteed by if cls.__doc__
+            for line in docstring.splitlines()[2:]:
                 print(f"{line}")
             print()
 

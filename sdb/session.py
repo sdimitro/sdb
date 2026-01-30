@@ -412,6 +412,8 @@ class TraceManager:  # pylint: disable=too-many-instance-attributes
 
     def _capture_struct_pointers(self, obj: drgn.Object, depth: int) -> None:
         """Capture pointer members of a struct."""
+        if obj.type_.members is None:
+            return
         for member in obj.type_.members:
             if member.name:
                 try:

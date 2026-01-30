@@ -71,8 +71,9 @@ def slab_linux_cache_source(cache: drgn.Object) -> str:
 def for_each_slab_flag_in_cache(cache: drgn.Object) -> Iterable[str]:
     assert sdb.type_canonical_name(cache.type_) == 'struct spl_kmem_cache *'
     flag = cache.skc_flags.value_()
-    for enum_entry, enum_entry_bit in cache.prog_.type(
-            'enum kmc_bit').enumerators:
+    enum_type = cache.prog_.type('enum kmc_bit')
+    assert enum_type.enumerators is not None
+    for enum_entry, enum_entry_bit in enum_type.enumerators:
         if flag & (1 << enum_entry_bit):
             yield enum_entry.replace('_BIT', '')
 

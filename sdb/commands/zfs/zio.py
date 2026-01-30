@@ -128,7 +128,7 @@ class Zio(sdb.Locator, sdb.PrettyPrinter):
             return True
         return False
 
-    def no_input(self) -> drgn.Object:
+    def no_input(self) -> Iterable[drgn.Object]:
         if self.args.parents:
             raise sdb.CommandInvalidInputError(
                 self.name, "command argument -p is not applicable " +

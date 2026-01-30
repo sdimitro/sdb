@@ -187,10 +187,11 @@ class Metaslab(sdb.Locator, sdb.PrettyPrinter):
             for i in self.args.metaslab_ids:
                 if i >= vdev.vdev_ms_count:
                     ms_count = int(vdev.vdev_ms_count)
-                    vdev = int(vdev.vdev_id)
+                    vdev_id = int(vdev.vdev_id)
                     raise sdb.CommandError(
                         self.name, f"metaslab id {i} not valid; "
-                        f"there are only {ms_count} metaslabs in vdev {vdev}")
+                        f"there are only {ms_count} metaslabs in vdev {vdev_id}"
+                    )
                 yield vdev.vdev_ms[i]
         else:
             for i in range(int(vdev.vdev_ms_count)):

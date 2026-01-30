@@ -34,6 +34,10 @@ except ImportError:
 # the modules are imported and attempt to have a cleaner
 # separation of concerns between modules.
 #
+# Export submodules for direct access (e.g., sdb.target.create_object())
+from sdb import error
+from sdb import target
+
 from sdb.error import (
     Error,
     CommandNotFoundError,
@@ -88,6 +92,8 @@ __all__ = [
     '__version__',
     'Address',
     'All',
+    'error',
+    'target',
     'Cast',
     'Command',
     'CommandArgumentsError',
