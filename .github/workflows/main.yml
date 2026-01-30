@@ -45,6 +45,7 @@ jobs:
           python-version: '3.10'
       - run: ./.github/scripts/install-drgn.sh
       - run: python3 -m pip install pylint pytest ruff yapf
+      - run: python3 -m pip install .
       #
       # Pylint checks
       #
@@ -80,6 +81,7 @@ jobs:
           python-version: '3.10'
       - run: ./.github/scripts/install-drgn.sh
       - run: python3 -m pip install mypy pyright pytest
+      - run: python3 -m pip install .
       #
       # Mypy checks
       # Note: --ignore-missing-imports for tests because pytest doesn't provide stubs
@@ -114,6 +116,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: python3 -m pip install pytest pytest-cov
       - run: ./.github/scripts/install-drgn.sh
+      - run: python3 -m pip install .
       - run: pytest -v --cov sdb --cov-report xml tests/unit
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -140,6 +143,7 @@ jobs:
       - run: python3 -m pip install pytest pytest-cov
       - run: ./.github/scripts/install-libkdumpfile.sh
       - run: ./.github/scripts/install-drgn.sh
+      - run: python3 -m pip install .
       - run: ./.github/scripts/download-dumps-from-gdrive.sh
       - run: ./.github/scripts/extract-dump.sh dump.201912060006.tar.lzma
       - run: ./.github/scripts/extract-dump.sh dump.202303131823.tar.gz
